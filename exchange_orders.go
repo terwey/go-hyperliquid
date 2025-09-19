@@ -111,34 +111,11 @@ func newCreateOrderAction(
 }
 
 func (e *Exchange) Order(
-	req CreateOrderRequest,
-	builder *BuilderInfo,
-) (result OrderStatus, err error) {
-	resp, err := e.BulkOrders([]CreateOrderRequest{req}, builder)
-	if err != nil {
-		return
-	}
-
-	if !resp.Ok {
-		err = fmt.Errorf("failed to create order: %s", resp.Err)
-		return
-	}
-
-	data := resp.Data
-	if len(data.Statuses) == 0 {
-		err = fmt.Errorf("no status for order: %s", resp.Err)
-		return
-	}
-
-	return data.Statuses[0], nil
-}
-
-func (e *Exchange) OrderWithContext(
 	ctx context.Context,
 	req CreateOrderRequest,
 	builder *BuilderInfo,
 ) (result OrderStatus, err error) {
-	resp, err := e.BulkOrdersWithContext(ctx, []CreateOrderRequest{req}, builder)
+	resp, err := e.BulkOrders(ctx, []CreateOrderRequest{req}, builder)
 	if err != nil {
 		return
 	}
@@ -158,13 +135,6 @@ func (e *Exchange) OrderWithContext(
 }
 
 func (e *Exchange) BulkOrders(
-	orders []CreateOrderRequest,
-	builder *BuilderInfo,
-) (result *APIResponse[OrderResponse], err error) {
-	return e.BulkOrdersWithContext(context.Background(), orders, builder)
-}
-
-func (e *Exchange) BulkOrdersWithContext(
 	ctx context.Context,
 	orders []CreateOrderRequest,
 	builder *BuilderInfo,
@@ -261,12 +231,6 @@ func newModifyOrdersAction(
 
 // ModifyOrder modifies an existing order
 func (e *Exchange) ModifyOrder(
-	req ModifyOrderRequest,
-) (result OrderStatus, err error) {
-	return e.ModifyOrderWithContext(context.Background(), req)
-}
-
-func (e *Exchange) ModifyOrderWithContext(
 	ctx context.Context,
 	req ModifyOrderRequest,
 ) (result OrderStatus, err error) {
@@ -298,12 +262,6 @@ func (e *Exchange) ModifyOrderWithContext(
 
 // BulkModifyOrders modifies multiple orders
 func (e *Exchange) BulkModifyOrders(
-	modifyRequests []ModifyOrderRequest,
-) ([]OrderStatus, error) {
-	return e.BulkModifyOrdersWithContext(context.Background(), modifyRequests)
-}
-
-func (e *Exchange) BulkModifyOrdersWithContext(
 	ctx context.Context,
 	modifyRequests []ModifyOrderRequest,
 ) ([]OrderStatus, error) {
@@ -332,6 +290,7 @@ func (e *Exchange) BulkModifyOrdersWithContext(
 
 // MarketOpen opens a market position
 func (e *Exchange) MarketOpen(
+	ctx context.Context,
 	name string,
 	isBuy bool,
 	sz float64,
@@ -340,7 +299,7 @@ func (e *Exchange) MarketOpen(
 	cloid *string,
 	builder *BuilderInfo,
 ) (res OrderStatus, err error) {
-	slippagePrice, err := e.SlippagePrice(name, isBuy, slippage, px)
+	slippagePrice, err := e.SlippagePrice(ctx, name, isBuy, slippage, px)
 	if err != nil {
 		return
 	}
@@ -349,7 +308,7 @@ func (e *Exchange) MarketOpen(
 		Limit: &LimitOrderType{Tif: TifIoc},
 	}
 
-	return e.Order(CreateOrderRequest{
+	return e.Order(ctx, CreateOrderRequest{
 		Coin:          name,
 		IsBuy:         isBuy,
 		Size:          sz,
@@ -362,6 +321,7 @@ func (e *Exchange) MarketOpen(
 
 // MarketClose closes a position
 func (e *Exchange) MarketClose(
+	ctx context.Context,
 	coin string,
 	sz *float64,
 	px *float64,
@@ -374,7 +334,7 @@ func (e *Exchange) MarketClose(
 		address = e.vault
 	}
 
-	userState, err := e.info.UserState(address)
+	userState, err := e.info.UserState(ctx, address)
 	if err != nil {
 		return OrderStatus{}, err
 	}
@@ -395,7 +355,7 @@ func (e *Exchange) MarketClose(
 
 		isBuy := szi < 0
 
-		slippagePrice, err := e.SlippagePrice(coin, isBuy, slippage, px)
+		slippagePrice, err := e.SlippagePrice(ctx, coin, isBuy, slippage, px)
 		if err != nil {
 			return OrderStatus{}, err
 		}
@@ -404,7 +364,7 @@ func (e *Exchange) MarketClose(
 			Limit: &LimitOrderType{Tif: TifIoc},
 		}
 
-		return e.Order(CreateOrderRequest{
+		return e.Order(ctx, CreateOrderRequest{
 			Coin:          coin,
 			IsBuy:         isBuy,
 			Size:          size,

@@ -19,10 +19,11 @@ type (
 )
 
 func (e *Exchange) Cancel(
+	ctx context.Context,
 	coin string,
 	oid int64,
 ) (res *APIResponse[CancelOrderResponse], err error) {
-	return e.BulkCancel([]CancelOrderRequest{
+	return e.BulkCancel(ctx, []CancelOrderRequest{
 		{
 			Coin:    coin,
 			OrderID: oid,
@@ -31,12 +32,6 @@ func (e *Exchange) Cancel(
 }
 
 func (e *Exchange) BulkCancel(
-	requests []CancelOrderRequest,
-) (res *APIResponse[CancelOrderResponse], err error) {
-	return e.BulkCancelWithContext(context.Background(), requests)
-}
-
-func (e *Exchange) BulkCancelWithContext(
 	ctx context.Context,
 	requests []CancelOrderRequest,
 ) (res *APIResponse[CancelOrderResponse], err error) {
@@ -76,9 +71,10 @@ type CancelOrderRequestByCloid struct {
 }
 
 func (e *Exchange) CancelByCloid(
+	ctx context.Context,
 	coin, cloid string,
 ) (res *APIResponse[CancelOrderResponse], err error) {
-	return e.BulkCancelByCloids([]CancelOrderRequestByCloid{
+	return e.BulkCancelByCloids(ctx, []CancelOrderRequestByCloid{
 		{
 			Coin:  coin,
 			Cloid: cloid,
@@ -87,12 +83,6 @@ func (e *Exchange) CancelByCloid(
 }
 
 func (e *Exchange) BulkCancelByCloids(
-	requests []CancelOrderRequestByCloid,
-) (res *APIResponse[CancelOrderResponse], err error) {
-	return e.BulkCancelByCloidsWithContext(context.Background(), requests)
-}
-
-func (e *Exchange) BulkCancelByCloidsWithContext(
 	ctx context.Context,
 	requests []CancelOrderRequestByCloid,
 ) (res *APIResponse[CancelOrderResponse], err error) {

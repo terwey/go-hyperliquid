@@ -17,9 +17,13 @@ type Exchange struct {
 	info         *Info
 	expiresAfter *int64
 	lastNonce    atomic.Int64
+
+	clientOpts []ClientOpt
+	infoOpts   []InfoOpt
 }
 
 func NewExchange(
+	ctx context.Context,
 	privateKey *ecdsa.PrivateKey,
 	baseURL string,
 	meta *Meta,
@@ -37,19 +41,29 @@ func NewExchange(
 		opt.Apply(ex)
 	}
 
-	var (
-		clientOpts []ClientOpt
-		infoOpts   []InfoOpt
-	)
 	if ex.debug {
-		clientOpts = append(clientOpts, ClientOptDebugMode())
-		infoOpts = append(infoOpts, InfoOptDebugMode())
+		ex.clientOpts = append(ex.clientOpts, ClientOptDebugMode())
+		ex.infoOpts = append(ex.infoOpts, InfoOptDebugMode())
 	}
 
-	ex.client = NewClient(baseURL, clientOpts...)
-	ex.info = NewInfo(baseURL, true, meta, spotMeta, infoOpts...)
+	ex.client = NewClient(baseURL, ex.clientOpts...)
+	ex.info = NewInfo(ctx, baseURL, true, meta, spotMeta, ex.infoOpts...)
 
 	return ex
+}
+
+// ExchangeOptClientOptions allows passing of ClientOpt to Client
+func ExchangeOptClientOptions(opts ...ClientOpt) ExchangeOpt {
+	return func(e *Exchange) {
+		e.clientOpts = append(e.clientOpts, opts...)
+	}
+}
+
+// ExchangeOptInfoOptions allows passing of InfoOpt to Info
+func ExchangeOptInfoOptions(opts ...InfoOpt) ExchangeOpt {
+	return func(e *Exchange) {
+		e.infoOpts = append(e.infoOpts, opts...)
+	}
 }
 
 // nextNonce returns either the current timestamp in milliseconds or incremented by one to prevent duplicates

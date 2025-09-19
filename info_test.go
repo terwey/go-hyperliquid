@@ -1,17 +1,18 @@
 package hyperliquid
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestMetaAndAssetCtxs(t *testing.T) {
-	info := NewInfo(MainnetAPIURL, true, nil, nil)
+	info := NewInfo(context.Background(), MainnetAPIURL, true, nil, nil)
 
 	initRecorder(t, false, "MetaAndAssetCtxs")
 
-	res, err := info.MetaAndAssetCtxs()
+	res, err := info.MetaAndAssetCtxs(context.Background())
 	t.Logf("res: %+v", res)
 	t.Logf("err: %v", err)
 
@@ -65,11 +66,11 @@ func TestMetaAndAssetCtxs(t *testing.T) {
 }
 
 func TestSpotMetaAndAssetCtxs(t *testing.T) {
-	info := NewInfo(MainnetAPIURL, true, nil, nil)
+	info := NewInfo(context.Background(), MainnetAPIURL, true, nil, nil)
 
 	initRecorder(t, false, "SpotMetaAndAssetCtxs")
 
-	res, err := info.SpotMetaAndAssetCtxs()
+	res, err := info.SpotMetaAndAssetCtxs(context.Background())
 	t.Logf("res: %+v", res)
 	t.Logf("err: %v", err)
 
@@ -128,11 +129,11 @@ func TestSpotMetaAndAssetCtxs(t *testing.T) {
 }
 
 func TestMeta(t *testing.T) {
-	info := NewInfo(MainnetAPIURL, true, nil, nil)
+	info := NewInfo(context.Background(), MainnetAPIURL, true, nil, nil)
 
 	initRecorder(t, false, "Meta")
 
-	res, err := info.Meta()
+	res, err := info.Meta(context.Background())
 	t.Logf("res: %+v", res)
 	t.Logf("err: %v", err)
 
@@ -178,11 +179,11 @@ func TestMeta(t *testing.T) {
 }
 
 func TestSpotMeta(t *testing.T) {
-	info := NewInfo(MainnetAPIURL, true, nil, nil)
+	info := NewInfo(context.Background(), MainnetAPIURL, true, nil, nil)
 
 	initRecorder(t, false, "SpotMeta")
 
-	res, err := info.SpotMeta()
+	res, err := info.SpotMeta(context.Background())
 	t.Logf("res: %+v", res)
 	t.Logf("err: %v", err)
 
@@ -247,7 +248,7 @@ func TestQueryOrderByOid(t *testing.T) {
 		useTestnet   bool
 	}
 
-	info := NewInfo(MainnetAPIURL, true, nil, nil)
+	info := NewInfo(context.Background(), MainnetAPIURL, true, nil, nil)
 
 	cases := []tc{
 		{
@@ -344,12 +345,12 @@ func TestQueryOrderByOid(t *testing.T) {
 
 			var infoInstance *Info
 			if tc.useTestnet {
-				infoInstance = NewInfo(TestnetAPIURL, true, nil, nil)
+				infoInstance = NewInfo(context.Background(), TestnetAPIURL, true, nil, nil)
 			} else {
 				infoInstance = info
 			}
 
-			res, err := infoInstance.QueryOrderByOid(tc.user, tc.oid)
+			res, err := infoInstance.QueryOrderByOid(context.Background(), tc.user, tc.oid)
 			tt.Logf("res: %+v", res)
 			tt.Logf("err: %v", err)
 
@@ -393,7 +394,7 @@ func TestUserFillsByTime(t *testing.T) {
 		useTestnet   bool
 	}
 
-	info := NewInfo(MainnetAPIURL, true, nil, nil)
+	info := NewInfo(context.Background(), MainnetAPIURL, true, nil, nil)
 
 	cases := []tc{
 		{
@@ -459,12 +460,12 @@ func TestUserFillsByTime(t *testing.T) {
 
 			var infoInstance *Info
 			if tc.useTestnet {
-				infoInstance = NewInfo(TestnetAPIURL, true, nil, nil)
+				infoInstance = NewInfo(context.Background(), TestnetAPIURL, true, nil, nil)
 			} else {
 				infoInstance = info
 			}
 
-			res, err := infoInstance.UserFillsByTime(tc.user, tc.startTime, tc.endTime)
+			res, err := infoInstance.UserFillsByTime(context.Background(), tc.user, tc.startTime, tc.endTime)
 			tt.Logf("res: %+v", res)
 			tt.Logf("err: %v", err)
 
@@ -503,7 +504,7 @@ func TestSpotUserState(t *testing.T) {
 		useTestnet   bool
 	}
 
-	info := NewInfo(MainnetAPIURL, true, nil, nil)
+	info := NewInfo(context.Background(), MainnetAPIURL, true, nil, nil)
 
 	cases := []tc{
 		{
@@ -546,12 +547,12 @@ func TestSpotUserState(t *testing.T) {
 
 			var infoInstance *Info
 			if tc.useTestnet {
-				infoInstance = NewInfo(TestnetAPIURL, true, nil, nil)
+				infoInstance = NewInfo(context.Background(), TestnetAPIURL, true, nil, nil)
 			} else {
 				infoInstance = info
 			}
 
-			res, err := infoInstance.SpotUserState(tc.user)
+			res, err := infoInstance.SpotUserState(context.Background(), tc.user)
 			tt.Logf("res: %+v", res)
 			tt.Logf("err: %v", err)
 
@@ -592,7 +593,7 @@ func TestUserActiveAssetData(t *testing.T) {
 		useTestnet   bool
 	}
 
-	info := NewInfo(MainnetAPIURL, true, nil, nil)
+	info := NewInfo(context.Background(), MainnetAPIURL, true, nil, nil)
 
 	cases := []tc{
 		{
@@ -622,12 +623,12 @@ func TestUserActiveAssetData(t *testing.T) {
 
 			var infoInstance *Info
 			if tc.useTestnet {
-				infoInstance = NewInfo(TestnetAPIURL, true, nil, nil)
+				infoInstance = NewInfo(context.Background(), TestnetAPIURL, true, nil, nil)
 			} else {
 				infoInstance = info
 			}
 
-			res, err := infoInstance.UserActiveAssetData(tc.user, tc.coin)
+			res, err := infoInstance.UserActiveAssetData(context.Background(), tc.user, tc.coin)
 			tt.Logf("res: %+v", res)
 			tt.Logf("err: %v", err)
 

@@ -2,6 +2,7 @@ package hyperliquid
 
 import (
 	"bytes"
+	"context"
 	"crypto/ecdsa"
 	"encoding/json"
 	"fmt"
@@ -35,6 +36,7 @@ func newExchange(key string, url string) (*Exchange, error) {
 	accountAddr := crypto.PubkeyToAddress(*pubECDSA).Hex()
 
 	exchange := NewExchange(
+		context.Background(),
 		privateKey,
 		url,
 		nil, // Meta will be fetched automatically
@@ -273,7 +275,7 @@ func TestOrders(t *testing.T) {
 			// we don't care about errors here
 			initRecorder(tt, tc.record, tc.cassetteName)
 
-			res, err := tc.exchange.Order(tc.order, nil)
+			res, err := tc.exchange.Order(context.Background(), tc.order, nil)
 			tt.Logf("res: %v", res)
 			tt.Logf("err: %v", err)
 			if tc.wantErr != "" {
